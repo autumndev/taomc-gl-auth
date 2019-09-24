@@ -11,8 +11,8 @@
         "greenlight auth"
     ],
     "support": {
-        "docs": "???",
-        "issues": "???"
+        "docs": "https://github.com/autumndev/taomc-gl-auth",
+        "issues": "https://github.com/autumndev/taomc-gl-auth/issues"
     },
     "license": "MIT",
     "authors": [
@@ -34,7 +34,7 @@
         "handle": "green-light-auth",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "",
+        "changelogUrl": "https://github.com/autumndev/taomc-gl-auth/blob/master/CHANGELOG.md",
         "class": "autumndev\\greenlightauth\\GreenlightAuth"
     }
 }
