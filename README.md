@@ -24,20 +24,10 @@ To install the plugin, follow these instructions.
 
 ## GreenLight Auth Overview
 
--Insert text here-
+Allows the system to auto add group to user, auto activate the user and then redirect to the end portal.
 
 ## Configuring GreenLight Auth
 
--Insert text here-
-
-## Using GreenLight Auth
-
--Insert text here-
-
-## GreenLight Auth Roadmap
-
-Some things to do, and ideas for potential features:
-
-* Release it
+Create new group: name = 'GREENLIGHT', handle = 'greenlight'
 
 Brought to you by [Scott Jones](autumndev.co.uk)

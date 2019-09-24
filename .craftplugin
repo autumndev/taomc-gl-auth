@@ -1,1 +1,24 @@
-{"pluginName":"GreenLight Auth","pluginDescription":"Bespoke authentication for GreenLight users","pluginVersion":1,"pluginAuthorName":"Scott Jones","pluginVendorName":"autumndev","pluginAuthorUrl":"autumndev.co.uk","pluginAuthorGithub":"","codeComments":"yes","pluginComponents":["controllers"],"consolecommandName":"","controllerName":"","cpsectionName":"","elementName":"","fieldName":"","modelName":"","purchasableName":"","recordName":"","serviceName":"","taskName":"","utilityName":"","widgetName":"","apiVersion":"api_version_3_0"}
+{
+    "pluginName": "GreenLight Auth",
+    "pluginDescription": "Bespoke authentication for GreenLight users",
+    "pluginVersion": 1,
+    "pluginAuthorName": "Scott Jones",
+    "pluginVendorName": "autumndev",
+    "pluginAuthorUrl": "autumndev.co.uk",
+    "pluginAuthorGithub": "",
+    "codeComments": "yes",
+    "pluginComponents": [],
+    "consolecommandName": "",
+    "controllerName": "",
+    "cpsectionName": "",
+    "elementName": "",
+    "fieldName": "",
+    "modelName": "",
+    "purchasableName": "",
+    "recordName": "",
+    "serviceName": "",
+    "taskName": "",
+    "utilityName": "",
+    "widgetName": "",
+    "apiVersion": "api_version_3_0"
+}

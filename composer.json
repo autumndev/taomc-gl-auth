@@ -34,7 +34,7 @@
         "handle": "green-light-auth",
         "hasCpSettings": false,
         "hasCpSection": false,
-        "changelogUrl": "???",
+        "changelogUrl": "",
         "class": "autumndev\\greenlightauth\\GreenlightAuth"
     }
 }
