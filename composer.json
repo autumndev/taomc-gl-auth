@@ -1,5 +1,5 @@
 {
-    "name": "autumndev/green-light-auth",
+    "name": "autumndev/greenLightAuth",
     "description": "Bespoke authentication for GreenLight users",
     "type": "craft-plugin",
     "version": "1",
