@@ -1,0 +1,40 @@
+{
+    "name": "autumndev/green-light-auth",
+    "description": "Bespoke authentication for GreenLight users",
+    "type": "craft-plugin",
+    "version": "1",
+    "keywords": [
+        "craft",
+        "cms",
+        "craftcms",
+        "craft-plugin",
+        "greenlight auth"
+    ],
+    "support": {
+        "docs": "???",
+        "issues": "???"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Scott Jones",
+            "homepage": "autumndev.co.uk"
+        }
+    ],
+    "require": {
+        "craftcms/cms": "^3.0.0-RC1"
+    },
+    "autoload": {
+        "psr-4": {
+          "autumndev\\greenlightauth\\": "src/"
+        }
+    },
+    "extra": {
+        "name": "GreenLight Auth",
+        "handle": "green-light-auth",
+        "hasCpSettings": false,
+        "hasCpSection": false,
+        "changelogUrl": "???",
+        "class": "autumndev\\greenlightauth\\GreenlightAuth"
+    }
+}
