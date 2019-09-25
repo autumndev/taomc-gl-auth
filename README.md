@@ -26,6 +26,7 @@ Allows the system to auto add group to user, auto activate the user and then red
 
 ## Configuring GreenLight Auth
 
-Create new group: name = 'GREENLIGHT', handle = 'greenlight'
+Create new group: name = 'GREENLIGHT', handle = 'greenlight'.
+env fiel - add `GREENLIGHT_REDIRECT_URL` as the url to redirect GL user to.
 
 Brought to you by [autumn.dev](autumndev.co.uk)

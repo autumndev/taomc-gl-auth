@@ -13,8 +13,11 @@ namespace autumndev\greenlightauth;
 
 use Craft;
 use craft\base\Plugin;
+use craft\elements\User;
+use craft\services\Elements;
 use craft\services\Users;
 use craft\events\UserAssignGroupEvent;
+use craft\records\User as UserRecord;
 use yii\base\Application;
 use yii\base\Event;
 use craft\web\User as WebUser;
@@ -37,7 +40,6 @@ use craft\web\User as WebUser;
 class GreenlightAuth extends Plugin
 {
     const WHITELABEL    = "greenlight";
-    const REDIRECTURL   = "https://www.google.co.uk";
     // Static Properties
     // =========================================================================
 
@@ -79,6 +81,11 @@ class GreenlightAuth extends Plugin
         self::$plugin = $this;
 
         // Register Events
+        // Event::on(
+        //     Elements::class, 
+        //     Elements::EVENT_AFTER_SAVE_ELEMENT, 
+        //     [$this, 'onCustomRegister']
+        // );
         Event::on(
             Users::class, 
             Users::EVENT_AFTER_ASSIGN_USER_TO_DEFAULT_GROUP, 
@@ -102,6 +109,7 @@ class GreenlightAuth extends Plugin
      * @return void
      */
     public function onCustomRegister(UserAssignGroupEvent $event)
+    // public function onCustomRegister(ElementEvent $event)
     {
         $this->log("start", __METHOD__);
         $greenlight = Craft::$app->getRequest()->post('whitelabel');
@@ -113,12 +121,15 @@ class GreenlightAuth extends Plugin
             $this->log("Activate user result: {$r}", __METHOD__);
             // assign to group
             $groupId = $this->getGroupId(self::WHITELABEL);
+            $this->log(self::WHITELABEL." group id: {$groupId}", __METHOD__);
             // NB: this can be used to assign multiple groups. second param is array of group IDs
             $gr = Craft::$app->getUsers()->assignUserToGroups($event->user->id, [$groupId]);
             $this->log("Assign group to user result: {$gr}", __METHOD__);
         }
+
         $this->log("end", __METHOD__);
     }
+
     /**
      * upon login, check user for greenlight group and redirect if required
      * 
@@ -151,8 +162,12 @@ class GreenlightAuth extends Plugin
             $groups = Craft::$app->getUserGroups()->getGroupsByUserId($user->id);
             foreach ($groups as $group) {
                 if ('GREENLIGHT' === $group->name) {
+                    $redirectUrl = env('GREENLIGHT_REDIRECT_URL');
+                    if ('' === $redirectUrl) {
+                        throw new \Exception("No redirect URL defined");
+                    }
                     // redirect to docebo
-                    Craft::$app->getResponse()->redirect(self::REDIRECTURL);
+                    Craft::$app->getResponse()->redirect($redirectUrl);
                     Craft::$app->end();
                 }
             }
@@ -180,6 +195,8 @@ class GreenlightAuth extends Plugin
     {
         $groups = Craft::$app->userGroups->getAllGroups();
         foreach ($groups as $group) {
+            Craft::dump($group->name.':'.$group->id);
+            Craft::dump(strtolower($group->name) === strtolower($groupName));
             if (strtolower($group->name) === strtolower($groupName)) {
                 return $group->id;
             }
