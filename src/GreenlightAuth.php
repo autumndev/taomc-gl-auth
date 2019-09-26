@@ -157,7 +157,7 @@ class GreenlightAuth extends Plugin
     private function checkGreenLightUser()
     {
         // first check to ensure we are not coming from SSO 
-        if (true == strpos(Craft::$app->getRequest()->getPathInfo(), 'sso')) {
+        if (strpos(Craft::$app->getRequest()->getPathInfo(), 'sso') !== false) {
             // SSO request ignore
             return;
         }
