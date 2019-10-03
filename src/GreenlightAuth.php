@@ -109,7 +109,6 @@ class GreenlightAuth extends Plugin
      * @return void
      */
     public function onCustomRegister(UserAssignGroupEvent $event)
-    // public function onCustomRegister(ElementEvent $event)
     {
         $this->log("start", __METHOD__);
         $greenlight = Craft::$app->getRequest()->post('whitelabel');
@@ -120,10 +119,9 @@ class GreenlightAuth extends Plugin
             $r = Craft::$app->getUsers()->activateUser($event->user);
             $this->log("Activate user result: {$r}", __METHOD__);
             // assign to group
-            $groupId = $this->getGroupId(self::WHITELABEL);
-            $this->log(self::WHITELABEL." group id: {$groupId}", __METHOD__);
+            $group = Craft::$app->userGroups->getGroupByHandle(self::WHITELABEL);
             // NB: this can be used to assign multiple groups. second param is array of group IDs
-            $gr = Craft::$app->getUsers()->assignUserToGroups($event->user->id, [$groupId]);
+            $gr = Craft::$app->getUsers()->assignUserToGroups($event->user->id, [$group->id]);
             $this->log("Assign group to user result: {$gr}", __METHOD__);
         }
 
@@ -189,26 +187,7 @@ class GreenlightAuth extends Plugin
     {
         return true;
     }
-    /**
-     * takes a group name and searches the craft groups for its ID.
-     *
-     * @param string $groupName
-     * 
-     * @return integer
-     */
-    private function getGroupId(string $groupName): int
-    {
-        $groups = Craft::$app->userGroups->getAllGroups();
-        foreach ($groups as $group) {
-            Craft::dump($group->name.':'.$group->id);
-            Craft::dump(strtolower($group->name) === strtolower($groupName));
-            if (strtolower($group->name) === strtolower($groupName)) {
-                return $group->id;
-            }
-        }
 
-        throw new \Exception("Group Not found");
-    }
     /**
      * logs stuff
      *
@@ -221,7 +200,7 @@ class GreenlightAuth extends Plugin
     {
         Craft::info(
             "GLP: {$log}",
-            $method
+            'autumndev'
         );
     }
 }
