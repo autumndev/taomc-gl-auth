@@ -20,7 +20,14 @@ use craft\events\UserAssignGroupEvent;
 use craft\records\User as UserRecord;
 use yii\base\Application;
 use yii\base\Event;
+use craft\web\ErrorHandler;
+use craft\events\RegisterEmailMessagesEvent;
 use craft\web\User as WebUser;
+use craft\services\Sites;
+use craft\services\SystemMessages;
+
+use yii\base\ModelEvent;
+use GuzzleHttp\Client;
 
 /**
  * Craft plugins are very much like little applications in and of themselves. We’ve made
@@ -75,33 +82,62 @@ class GreenlightAuth extends Plugin
      * you do not need to load it in your init() method.
      *
      */
+     public function registerEmailMessages()
+       {
+           return array(
+               'welcome_whitelabel'
+           );
+       }
+
     public function init()
     {
         parent::init();
         self::$plugin = $this;
 
+        $this->_registerEmailMessages();
+
         // Register Events
-        // Event::on(
-        //     Elements::class, 
-        //     Elements::EVENT_AFTER_SAVE_ELEMENT, 
-        //     [$this, 'onCustomRegister']
-        // );
         Event::on(
-            Users::class, 
-            Users::EVENT_AFTER_ASSIGN_USER_TO_DEFAULT_GROUP, 
+            User::class,
+            User::EVENT_BEFORE_VALIDATE,
+            [$this, 'beforeRegistrationValidate']
+        );
+        Event::on(
+            Users::class,
+            Users::EVENT_AFTER_ASSIGN_USER_TO_DEFAULT_GROUP,
             [$this, 'onCustomRegister']
         );
         Event::on(
-            WebUser::class, 
-            WebUser::EVENT_AFTER_LOGIN , 
+            WebUser::class,
+            WebUser::EVENT_AFTER_LOGIN ,
             [$this, 'onCustomAuth']
         );
         Event::on(
-            Application::class, 
-            Application::EVENT_BEFORE_REQUEST, 
+            Application::class,
+            Application::EVENT_BEFORE_REQUEST,
             [$this, 'onBeforeApp']
         );
     }
+    /**
+     * validates a user email address on registration for GL whitelabels only
+     *
+     * @param ModelEvent $e
+     * @return void
+     */
+    public function beforeRegistrationValidate(ModelEvent $e)
+    {
+        $this->log("start", __METHOD__);
+        $user = $e->sender;
+        $greenlight = Craft::$app->getRequest()->post('whitelabel');
+        $this->log("whitelabel: {$greenlight}", __METHOD__);
+        if (self::WHITELABEL === $greenlight && !$this->validateEmail($user->email)) {
+            $user->addError('email', "Email not authorised");
+        }
+
+        $this->log("end", __METHOD__);
+    }
+
+
     /**
      * on register check registration form for greenlight flag, if present, register user
      * disable activation for user and add user to greenlight group.
@@ -121,8 +157,54 @@ class GreenlightAuth extends Plugin
             // assign to group
             $group = Craft::$app->userGroups->getGroupByHandle(self::WHITELABEL);
             // NB: this can be used to assign multiple groups. second param is array of group IDs
+            //$gr = "TEST";
             $gr = Craft::$app->getUsers()->assignUserToGroups($event->user->id, [$group->id]);
+            $this->sendActivationEmail($event->user);
             $this->log("Assign group to user result: {$gr}", __METHOD__);
+        }
+
+        $this->log("end", __METHOD__);
+    }
+
+    private function _registerEmailMessages()
+    {
+        Event::on(SystemMessages::class, SystemMessages::EVENT_REGISTER_MESSAGES, function(RegisterEmailMessagesEvent $event) {
+            $event->messages = array_merge($event->messages, [
+                [
+                    'key' => 'welcome_whitelabel',
+                    'heading' => Craft::t('green-light-auth', 'welcome_whitelabel_heading'),
+                    'subject' => Craft::t('green-light-auth', 'welcome_whitelabel_subject'),
+                    'body' => Craft::t('green-light-auth', 'welcome_whitelabel_body'),
+                ]
+            ]);
+        });
+    }
+
+    public function sendActivationEmail(craft\elements\user $user)
+    {
+        $this->log("start", __METHOD__);
+        $base = Craft::$app->getSites()->getPrimarySite()->getBaseUrl();
+        if(substr($base, -1) !== "/"){
+          $base = $base . "/";
+        }
+
+          try {
+
+          $message = Craft::$app->getMailer()->composeFromKey('welcome_whitelabel', ['subject' => 'Welcome to Greenlight'])->setTo($user)->setFrom(['no-reply@greenlight.com' => 'Green Light'])->setHtmlBody(
+            Craft::$app->getView()->renderTemplate('mail/welcome-white',[
+              'user'  => $user,
+              'logo' =>  $base . "assets/greenlight-logo.png",
+              'body' => "Welcome to the Green Light<br/><br/>Best Regards<br/><br/>Green Light"
+
+            ])
+          );
+          $message->send();
+
+        } catch (\Throwable $e) {
+
+          $err = new ErrorHandler();
+          $err->handleException($e);
+
         }
 
         $this->log("end", __METHOD__);
@@ -130,7 +212,7 @@ class GreenlightAuth extends Plugin
 
     /**
      * upon login, check user for greenlight group and redirect if required
-     * 
+     *
      * @return void
      */
     public function onCustomAuth()
@@ -154,7 +236,7 @@ class GreenlightAuth extends Plugin
      */
     private function checkGreenLightUser()
     {
-        // first check to ensure we are not coming from SSO 
+        // first check to ensure we are not coming from SSO
         if (strpos(Craft::$app->getRequest()->getPathInfo(), 'sso') !== false) {
             // SSO request ignore
             return;
@@ -185,7 +267,17 @@ class GreenlightAuth extends Plugin
      */
     private function validateEmail(string $email): bool
     {
-        return true;
+        $client = new Client([
+            // Base URI is used with relative requests
+            'base_uri' => 'https://support.greenlightsupplements.com/wp-json/wp/v2/is-email-valid-for-cpd-course/',
+            // You can set any number of default request options.
+            'timeout'  => 2.0,
+        ]);
+        $response = $client->request('GET', $email);
+        $body = $response->getBody();
+        $r = json_decode($body->getContents());
+
+        return $r->validEmailForCourse;
     }
 
     /**
@@ -193,7 +285,7 @@ class GreenlightAuth extends Plugin
      *
      * @param string $log
      * @param string $method
-     * 
+     *
      * @return void
      */
     private function log(string $log, string $method): void

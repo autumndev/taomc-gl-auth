@@ -2,7 +2,7 @@
     "name": "autumndev/greenLightAuth",
     "description": "Bespoke authentication for GreenLight users",
     "type": "craft-plugin",
-    "version": "1.0.5.2",
+    "version": "1.0.6",
     "keywords": [
         "craft",
         "cms",
@@ -22,7 +22,8 @@
         }
     ],
     "require": {
-        "craftcms/cms": "^3.0.0-RC1"
+        "craftcms/cms": "^3.0.0-RC1",
+        "guzzlehttp/guzzle": "~6.0"
     },
     "autoload": {
         "psr-4": {
