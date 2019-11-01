@@ -190,11 +190,19 @@ class GreenlightAuth extends Plugin
 
           try {
 
-          $message = Craft::$app->getMailer()->composeFromKey('welcome_whitelabel', ['subject' => 'Welcome to Greenlight'])->setTo($user)->setFrom(['no-reply@greenlight.com' => 'Green Light'])->setHtmlBody(
+          $message = Craft::$app->getMailer()->composeFromKey('welcome_whitelabel', ['subject' => 'Success. GreenLight CPD Course Registration complete'])->setTo($user)->setFrom(['support@greenlightsupplements.com' => 'GreenLight Support'])->setHtmlBody(
             Craft::$app->getView()->renderTemplate('mail/welcome-white',[
               'user'  => $user,
               'logo' =>  $base . "assets/greenlight-logo.png",
-              'body' => "Welcome to the Green Light<br/><br/>Best Regards<br/><br/>Green Light"
+              'body' => "Congratulations! You are now registered for the GreenLight CPD Course.<br/><br/>
+You can login here:<br/>
+https://taomc.org/greenlight/<br/><br/>
+When logging in, just use the email and password that you registered with.<br/><br/>
+For more information on GreenLight Supplements please visit us at
+greenlightsupplements.com<br/><br/>
+Kind regards,<br/><br/>
+The GreenLight Team<br/>
+support@greenlightsupplements.com"
 
             ])
           );
@@ -262,7 +270,7 @@ class GreenlightAuth extends Plugin
      * place holder for future email validation, either via csv or api call.
      *
      * @param string $email
-     * 
+     *
      * @return bool
      */
     private function validateEmail(string $email): bool
