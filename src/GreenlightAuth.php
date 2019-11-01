@@ -131,7 +131,7 @@ class GreenlightAuth extends Plugin
         $greenlight = Craft::$app->getRequest()->post('whitelabel');
         $this->log("whitelabel: {$greenlight}", __METHOD__);
         if (self::WHITELABEL === $greenlight && !$this->validateEmail($user->email)) {
-            $user->addError('email', "Email not authorised");
+            $user->addError('email', "Email not authorised. Please contact cpd.requests@greenlightsupplements.com for assistance.");
         }
 
         $this->log("end", __METHOD__);
